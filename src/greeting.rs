@@ -1,4 +1,4 @@
-use rocket::{http::{CookieJar, Status}, response::status};
+use rocket::{http::{CookieJar}, response::status};
 
 use crate::auth::auth;
 
