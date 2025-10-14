@@ -1,4 +1,7 @@
-use rocket::{http::{Cookie, CookieJar, SameSite}, serde::{json::Json, Deserialize, Serialize}};
+use rocket::{
+    http::{Cookie, CookieJar, SameSite},
+    serde::{json::Json, Deserialize, Serialize}
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct LoginRequest {
@@ -11,16 +14,30 @@ pub struct LoginResponse {
     status: String,
 }
 
-struct User {
-    username: String,
-    user_id: String,
-    email: String,
+pub struct User {
+    pub username: String,
+    pub user_id: String,
+    pub email: String,
     password: String,
     salt: String
 }
 
 fn get_user(username: &str) -> Option<User> {
     if username == "cmcderm" {
+        Some(User {
+            username: String::from("cmcderm"),
+            user_id: String::from("fake-uuid-whatever"),
+            email: String::from("connormcderm@gmail.com"),
+            password: String::from("XXXFAKEPASSWORDHASHXXX"),
+            salt: String::from("fakesalt")
+        })
+    } else {
+        None
+    }
+}
+
+fn get_user_by_id(user_id: &str) -> Option<User> {
+    if user_id == "fake-uuid-whatever" {
         Some(User {
             username: String::from("cmcderm"),
             user_id: String::from("fake-uuid-whatever"),
@@ -58,4 +75,16 @@ pub fn login(req: Json<LoginRequest>, jar: &CookieJar<'_>) -> Json<LoginResponse
     Json(LoginResponse {
         status: String::from("Failed"),
     })
+}
+
+pub fn auth(token: &str) -> Option<User> {
+    // JWT token parsing
+    if token == "fake.token.fake-uuid-whatever" {
+        let token_id = token.split('.').last()?;
+
+        get_user_by_id(token_id)
+
+    } else {
+        None
+    }
 }
