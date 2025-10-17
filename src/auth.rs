@@ -3,6 +3,8 @@ use rocket::{
     serde::{json::Json, Deserialize, Serialize}
 };
 
+use crate::jwt::open_jwt;
+
 #[derive(Serialize, Deserialize)]
 pub struct LoginRequest {
     username: String,
@@ -79,6 +81,7 @@ pub fn login(req: Json<LoginRequest>, jar: &CookieJar<'_>) -> Json<LoginResponse
 
 pub fn auth(token: &str) -> Option<User> {
     // JWT token parsing
+    open_jwt();
     if token == "fake.token.fake-uuid-whatever" {
         let token_id = token.split('.').last()?;
 

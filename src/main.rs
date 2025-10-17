@@ -2,6 +2,7 @@
 
 mod auth;
 mod greeting;
+mod jwt;
 
 #[get("/")]
 fn index() -> &'static str {
