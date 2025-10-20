@@ -3,7 +3,7 @@ use rocket::{
     serde::{json::Json, Deserialize, Serialize}
 };
 
-use crate::jwt::open_jwt;
+use crate::jwt::{self, open_jwt};
 
 #[derive(Serialize, Deserialize)]
 pub struct LoginRequest {
@@ -53,7 +53,7 @@ fn get_user_by_id(user_id: &str) -> Option<User> {
 }
 
 fn build_token(user: User) -> String {
-    format!("fake.token.{}", user.user_id).to_string()
+    jwt::create_jwt(user)
 }
 
 #[post("/login", format="json", data = "<req>")]
