@@ -61,6 +61,7 @@ pub fn login(req: Json<LoginRequest>, jar: &CookieJar<'_>) -> Json<LoginResponse
     if req.username != "" && req.password != "" {
         if let Some(u) = get_user(&req.username) {
             let token = build_token(u);
+
             let cookie = Cookie::build(("token", token))
                 .path("/")
                 .secure(true)
@@ -81,13 +82,7 @@ pub fn login(req: Json<LoginRequest>, jar: &CookieJar<'_>) -> Json<LoginResponse
 
 pub fn auth(token: &str) -> Option<User> {
     // JWT token parsing
-    open_jwt();
-    if token == "fake.token.fake-uuid-whatever" {
-        let token_id = token.split('.').last()?;
+    let opened_jwt = open_jwt(token)?;
 
-        get_user_by_id(token_id)
-
-    } else {
-        None
-    }
+    get_user_by_id(&opened_jwt.payload.sub)
 }
