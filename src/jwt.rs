@@ -1,8 +1,8 @@
-use std::{io::Write, time::{SystemTime, UNIX_EPOCH}};
-use hmac::{ Hmac, Mac };
+use std::time::{SystemTime, UNIX_EPOCH};
+use hmac::{Hmac, Mac};
 use sha2::Sha256;
 use base64::prelude::*;
-use rocket::serde::{ Deserialize, Serialize, json::Json };
+use rocket::serde::{Deserialize, Serialize};
 use serde_json;
 
 use crate::auth::User;
@@ -78,21 +78,23 @@ pub fn open_jwt(token: &str) -> Option<OpenedJwt> {
     let signature = token_iter.next()?;
     drop(token_iter);
 
-    let sig = generate_signature(&format!("{}.{}", header_b64, payload_b64), "secretsecretsecret");
+    let header_str = b64_to_utf8(header_b64)?;
+    let payload_str = b64_to_utf8(payload_b64)?;
 
+    let header: JwtHeader = serde_json::from_str(&header_str).ok()?;
+
+    // Only supporting one algorithm
+    if header.alg != "HS256" {
+        return None
+    }
+
+    let sig = generate_signature(&format!("{}.{}", header_b64, payload_b64), "secretsecretsecret");
     if signature != sig {
         println!("Signature doesn't match! Received: {} Computed: {}", signature, sig);
         return None
     }
 
-    let header_bytes = BASE64_URL_SAFE_NO_PAD.decode(&header_b64).ok()?;
-    let header_str = str::from_utf8(header_bytes.as_slice()).ok()?;
-
-    let payload_bytes = BASE64_URL_SAFE_NO_PAD.decode(&payload_b64).ok()?;
-    let payload_str = str::from_utf8(payload_bytes.as_slice()).ok()?;
-
-    let header: JwtHeader = serde_json::from_str(header_str).ok()?;
-    let payload: JwtPayload = serde_json::from_str(payload_str).ok()?;
+    let payload: JwtPayload = serde_json::from_str(&payload_str).ok()?;
 
     Some(OpenedJwt { header, payload })
 }
