@@ -40,7 +40,7 @@ fn b64_to_utf8(input: &str) -> Option<String> {
 
 pub fn create_jwt(user: User) -> String {
     let header = JwtHeader {
-        alg: String::from("HS256A"),
+        alg: String::from("HS256"),
         typ: String::from("JWT"),
     };
 
@@ -55,8 +55,10 @@ pub fn create_jwt(user: User) -> String {
 
     let payload_str = serde_json::to_string(&payload).expect("Bad payload");
 
+    let header_b64 = utf8_to_b64(&header_str);
+    let payload_b64 = utf8_to_b64(&payload_str);
 
-    let header_payload = format!("{}.{}", header_str, payload_str);
+    let header_payload = format!("{}.{}", header_b64, payload_b64);
 
     let signature = generate_signature(&header_payload, "secretsecretsecret");
 
@@ -76,7 +78,7 @@ pub fn open_jwt(token: &str) -> Option<OpenedJwt> {
     let signature = token_iter.next()?;
     drop(token_iter);
 
-    let sig = generate_signature(&format!("{}.{}", header_b64, header_b64), "secretsecretsecret");
+    let sig = generate_signature(&format!("{}.{}", header_b64, payload_b64), "secretsecretsecret");
 
     if signature != sig {
         println!("Signature doesn't match! Received: {} Computed: {}", signature, sig);
