@@ -1,21 +1,21 @@
 
 create extension if not exists "uuid-ossp";
 
-create table Users {
+create table users (
     user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username TEXT NOT NULL,
     admin BOOLEAN NOT NULL DEFAULT FALSE,
     email TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
-};
+);
 
-insert into users (
+insert into Users (
     username,
     email,
     admin
 )
 VALUES
 ('cmcderm', 'connormcderm@protonmail.com', true),
-('toffee', 'boof@woof.com', false)
+('toffee', 'boof@woof.com', false),
 ('mocha', 'bork@woof.com', false);
 

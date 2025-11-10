@@ -1,0 +1,29 @@
+services:
+  api:
+    container_name: rust_api
+    image: cmcderm/rust_api:1.0.0
+    build:
+      context: .
+      dockerfile: dockerfile
+      args:
+        DATABASE_URL: postgres://dev:devpass@rustdb:5432/postgres
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: api_test_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: rustdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/initsql.sql
+      - type: tmpfs
+        target: /var/lib/postgresql/data
+
