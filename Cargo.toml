@@ -7,8 +7,11 @@ edition = "2021"
 
 [dependencies]
 base64 = "0.22.1"
+bcrypt = "0.17.1"
 hmac = "0.12.1"
 rocket = { version="0.5.1", features=["json"] }
 serde = { version="1.0.228", features=["derive"] }
 serde_json = "1.0.145"
 sha2 = "0.10.9"
+tokio = "1.48.0"
+tokio-postgres = "0.7.15"

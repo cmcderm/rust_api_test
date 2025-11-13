@@ -3,6 +3,8 @@
 mod auth;
 mod greeting;
 mod jwt;
+mod database;
+mod user;
 
 #[get("/")]
 fn index() -> &'static str {
@@ -10,7 +12,7 @@ fn index() -> &'static str {
 }
 
 #[launch]
-fn rocket() -> _ {
+async fn rocket() -> _ {
     rocket::build().mount("/api", routes![
         index,
         auth::login,

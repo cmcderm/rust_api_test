@@ -5,7 +5,7 @@ use base64::prelude::*;
 use rocket::serde::{Deserialize, Serialize};
 use serde_json;
 
-use crate::auth::User;
+use crate::auth::{UserLogin};
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -38,7 +38,7 @@ fn b64_to_utf8(input: &str) -> Option<String> {
     Some(str::from_utf8(&bytes).ok()?.to_string())
 }
 
-pub fn create_jwt(user: User) -> String {
+pub fn create_jwt(user_login: UserLogin) -> String {
     let header = JwtHeader {
         alg: String::from("HS256"),
         typ: String::from("JWT"),
@@ -47,8 +47,8 @@ pub fn create_jwt(user: User) -> String {
     let header_str = serde_json::to_string(&header).expect("Bad header somehow");
 
     let payload = JwtPayload {
-        sub: user.user_id,
-        name: user.username,
+        sub: user_login.user_id,
+        name: user_login.username,
         admin: false,
         iat: SystemTime::now().duration_since(UNIX_EPOCH).expect("System time is before epoch!").as_secs(),
     };
